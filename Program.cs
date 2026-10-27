@@ -10,8 +10,12 @@ using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 var config = builder.Configuration;
-var conn = config.GetConnectionString("Loki") ?? "";
-var jwtKey = config["Jwt:SigningKey"] ?? "";
+var conn = config.GetConnectionString("Loki")
+    ?? throw new InvalidOperationException(
+        "Missing Loki database connection string.");
+var jwtKey = config["Jwt:SigningKey"]
+    ?? throw new InvalidOperationException(
+        "Missing JWT signing key.");
 if (string.IsNullOrWhiteSpace(conn) || Encoding.UTF8.GetByteCount(jwtKey) < 32)
     throw new InvalidOperationException("Set ConnectionStrings:Loki and Jwt:SigningKey (at least 32 UTF-8 bytes) in secure hosting configuration.");
 var allowed = config.GetSection("AllowedOrigins").Get<string[]>() ?? [];
